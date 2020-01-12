@@ -8,7 +8,7 @@ const initialState = {
 };
 
 const purchaseInit = (state, action) => {
-        return updatedObject(state, { purchsed: false });
+        return updatedObject(state, { purchased: false });
 }
 
 const purchaseBurgerStart = (state, action) => {
