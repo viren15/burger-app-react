@@ -8,6 +8,7 @@ import classes from './Auth.css';
 import * as actions from '../../store/actions/index';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import { Redirect } from 'react-router-dom';
+import { updatedObject, checkValidity } from '../../shared/utility';
 
 class Auth extends Component {
 	state = {
@@ -49,48 +50,15 @@ class Auth extends Component {
 			this.props.onSetAuthRedirectPath();
 		}
 	};
-
-	checkValidity(value, rules) {
-		let isValid = true;
-		if (!rules) {
-			return true;
-		}
-
-		if (rules.required) {
-			isValid = value.trim() !== '' && isValid;
-		}
-
-		if (rules.minLength) {
-			isValid = value.length >= rules.minLength && isValid;
-		}
-
-		if (rules.maxLength) {
-			isValid = value.length <= rules.minLength && isValid;
-		}
-
-		if (rules.isEmail) {
-			const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-			isValid = pattern.test(value) && isValid;
-		}
-
-		if (rules.isNumeric) {
-			const pattern = /^\d+$/;
-			isValid = pattern.test(value) && isValid;
-		}
-
-		return isValid;
-        };
         
         inputChangedHandler = (event, controlName) => {
-                const updatedControls = {
-                        ...this.state.controls,
-                        [controlName]: {
-                                ...this.state.controls[controlName],
-                                value: event.target.value,
-                                valid: this.checkValidity(event.target.value, this.state.controls[controlName].validation),
-                                touched: true
-                        }
-                };
+		const updatedControls = updatedObject(this.state.controls, {
+			[controlName]: updatedObject(this.state.controls[controlName], {
+				value: event.target.value,
+				valid: checkValidity(event.target.value, this.state.controls[controlName].validation),
+				touched: true
+			})
+		});
                 this.setState({ controls: updatedControls });
         };
 
@@ -166,7 +134,6 @@ class Auth extends Component {
 			<div className={classes.Auth}>
 				{authRedirect}
 				{errorMessage}
-				<h1>Error</h1>
 				<form onSubmit={this.submitHandler}>
 					{form}
 					<Button btnType='Success'>
